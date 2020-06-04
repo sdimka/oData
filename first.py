@@ -19,39 +19,55 @@ def main():
     #     for b in a['Товары']:
     #         print(b)
 
-    # catalog = 'Document_ЧекККМ'
-    # select = ''
-    # filt = "Date ge datetime'2020-05-23T00:00:00' and Date le datetime'2020-05-23T23:59:59' and " \
-    #        "ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
-    # res = request_jason_data(catalog, select, filt)
-    # # newDict = {key: value for (key, value) in res.items()
-    # #            if key['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000'}
-    # filtered_res = []
-    # for a in res['value']:
-    #     if a['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000':
-    #         filtered_res.append(a)
-    #         for b in a['Товары']:
-    #             pass
-    #             # print(b)
-    #
-    # for a in filtered_res:
-    #     print(a['Number'])
-    #     print(a['ЗаказОснование_Key'])
-    #     for b in a['Товары']:
-    #         catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
-    #         select = 'Description'
-    #         filt = ''
-    #         res = request_jason_data(catalog, select, filt)
-    #         b['Name'] = (res['Description'])
-    #         print(b)
+    catalog = 'Document_ЧекККМ'
+    select = ''
+    filt = "Date ge datetime'2020-05-23T00:00:00' and Date le datetime'2020-05-23T23:59:59' and " \
+           "ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
+    res = request_jason_data(catalog, select, filt)
+    # newDict = {key: value for (key, value) in res.items()
+    #            if key['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000'}
+    filtered_res = []
+    for a in res['value']:
+        if a['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000':
+            filtered_res.append(a)
+            for b in a['Товары']:
+                pass
+                # print(b)
 
     catalog = 'AccumulationRegister_ПродажиСебестоимость_RecordType'
-    select = ''
+    select = 'Recorder_Type, Подразделение_Key, Номенклатура_Key, Стоимость'
     filt = "Period ge datetime'2020-05-23T00:00:00' and Period le datetime'2020-05-23T23:59:59'"
     res = request_jason_data(catalog, select, filt)
+
+    sorted_cost_price = dict()
     print(res)
     for a in res['value']:
-        print(a)
+        if a['Recorder_Type'] == 'StandardODATA.Document_ОтчетОРозничныхПродажах' \
+                and a['Подразделение_Key'] == '1e2039a3-da0a-11dc-b992-001bfcc2ffde':
+            sorted_cost_price[a['Номенклатура_Key']] = a['Стоимость']
+
+    total_cost_price = 0
+    total_price = 0
+
+    for a in filtered_res:
+        doc_price = 0
+        print(a['Number'])
+        # print(a['ЗаказОснование_Key'])
+        for b in a['Товары']:
+            catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
+            select = 'Description'
+            filt = ''
+            res = request_jason_data(catalog, select, filt)
+            b['Name'] = (res['Description'])
+            b['cost_price'] = sorted_cost_price[b['Номенклатура_Key']]
+            print(f"{b['Name']} \t {b['cost_price']} ")
+            total_cost_price += b['cost_price']
+            total_price += b['Сумма']
+            doc_price += b['Сумма']
+        print(doc_price)
+
+    print(total_cost_price)
+    print(total_price)
 
 
 def request_jason_data(catalog, select, r_filter):
@@ -59,7 +75,6 @@ def request_jason_data(catalog, select, r_filter):
                      f'$format=json&' \
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
-    print(request_string)
     n_res = requests.get(request_string, auth=HTTPBasicAuth('sd', '12345'))
     n_res.encoding = 'utf-8'
     j_data = n_res.json()
