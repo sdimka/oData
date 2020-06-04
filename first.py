@@ -3,6 +3,9 @@ from requests.auth import HTTPBasicAuth
 
 
 def main():
+
+    START_DATE = '2020-05-02T00:00:00'
+    END_DATE = '2020-05-02T23:59:59'
     # catalog = 'Catalog_Контрагенты'
     # select = 'Ref_Key, Description, ИНН, КПП'
     # filt = 'ИНН eq \'7814153672\''
@@ -19,10 +22,16 @@ def main():
     #     for b in a['Товары']:
     #         print(b)
 
+    catalog = "Catalog_Номенклатура(Ref_Key=guid'b00f7fca-08ac-11e3-a448-005056950007')"
+    select = ''
+    filt = ''
+    res = request_jason_data(catalog, select, filt)
+    print(res)
+
     catalog = 'Document_ЧекККМ'
     select = ''
-    filt = "Date ge datetime'2020-05-23T00:00:00' and Date le datetime'2020-05-23T23:59:59' and " \
-           "ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
+    filt = f"Date ge datetime'{START_DATE}' and Date le datetime'{END_DATE}' and " \
+           f"ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
     res = request_jason_data(catalog, select, filt)
     # newDict = {key: value for (key, value) in res.items()
     #            if key['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000'}
@@ -36,11 +45,10 @@ def main():
 
     catalog = 'AccumulationRegister_ПродажиСебестоимость_RecordType'
     select = 'Recorder_Type, Подразделение_Key, Номенклатура_Key, Стоимость'
-    filt = "Period ge datetime'2020-05-23T00:00:00' and Period le datetime'2020-05-23T23:59:59'"
+    filt = f"Period ge datetime'{START_DATE}' and Period le datetime'{END_DATE}'"
     res = request_jason_data(catalog, select, filt)
 
     sorted_cost_price = dict()
-    print(res)
     for a in res['value']:
         if a['Recorder_Type'] == 'StandardODATA.Document_ОтчетОРозничныхПродажах' \
                 and a['Подразделение_Key'] == '1e2039a3-da0a-11dc-b992-001bfcc2ffde':
@@ -52,6 +60,7 @@ def main():
     for a in filtered_res:
         doc_price = 0
         print(a['Number'])
+        print(a['Ref_Key'])
         # print(a['ЗаказОснование_Key'])
         for b in a['Товары']:
             catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
