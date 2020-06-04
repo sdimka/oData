@@ -4,8 +4,8 @@ from requests.auth import HTTPBasicAuth
 
 def main():
 
-    START_DATE = '2020-05-02T00:00:00'
-    END_DATE = '2020-05-02T23:59:59'
+    START_DATE = '2020-05-23T00:00:00'
+    END_DATE = '2020-05-23T23:59:59'
     # catalog = 'Catalog_Контрагенты'
     # select = 'Ref_Key, Description, ИНН, КПП'
     # filt = 'ИНН eq \'7814153672\''
@@ -33,15 +33,8 @@ def main():
     filt = f"Date ge datetime'{START_DATE}' and Date le datetime'{END_DATE}' and " \
            f"ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
     res = request_jason_data(catalog, select, filt)
-    # newDict = {key: value for (key, value) in res.items()
-    #            if key['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000'}
-    filtered_res = []
-    for a in res['value']:
-        if a['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000':
-            filtered_res.append(a)
-            for b in a['Товары']:
-                pass
-                # print(b)
+    filtered_res = [value for value in res['value']
+               if value['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000']
 
     catalog = 'AccumulationRegister_ПродажиСебестоимость_RecordType'
     select = 'Recorder_Type, Подразделение_Key, Номенклатура_Key, Стоимость'
