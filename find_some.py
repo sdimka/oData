@@ -1,4 +1,4 @@
-from first import request_jason_data
+from getCostPriceOfSalary import request_jason_data
 from datetime import datetime
 
 
@@ -39,5 +39,5 @@ def get_product_by_id(id):
 
 
 # find_from_to()
-get_product_by_id('5e24bf7d-7a1a-11e4-87b0-005056950007')
+get_product_by_id('aadf2951-a8ce-11e7-a937-005056950094')
 

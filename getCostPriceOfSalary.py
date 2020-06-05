@@ -3,8 +3,8 @@ from requests.auth import HTTPBasicAuth
 
 
 def main():
-    start_date = '2020-05-01T00:00:00'
-    end_date = '2020-05-20T23:59:59'
+    start_date = '2020-04-01T00:00:00'
+    end_date = '2020-04-30T23:59:59'
     get_salary(start_date, end_date)
 
 
@@ -30,7 +30,7 @@ def get_salary(start_date, end_date):
     catalog = 'Document_ЧекККМ'
     select = ''
     filt = f"Date ge datetime'{start_date}' and Date le datetime'{end_date}' and " \
-           f"ЗаказОснование_Key ne '00000000-0000-0000-0000-000000000000'"
+           f"Posted eq true"
     res = request_jason_data(catalog, select, filt)
     filtered_res = [value for value in res['value']
                     if value['ЗаказОснование_Key'] != '00000000-0000-0000-0000-000000000000']
@@ -77,9 +77,11 @@ def get_salary(start_date, end_date):
 
                 # Не учитываем с/с доставки
                 if b['Номенклатура_Key'] != '785ef93b-8e84-11e9-95f9-00505695411f' \
+                        and b['Номенклатура_Key'] != 'aadf2951-a8ce-11e7-a937-005056950094'\
                         and b['Номенклатура_Key'] in sorted_cost_price:
                     b['cost_price'] = sorted_cost_price[b['Номенклатура_Key']]
-                elif b['Номенклатура_Key'] == '785ef93b-8e84-11e9-95f9-00505695411f':
+                elif b['Номенклатура_Key'] == '785ef93b-8e84-11e9-95f9-00505695411f' \
+                        or b['Номенклатура_Key'] == 'aadf2951-a8ce-11e7-a937-005056950094':
                     b['cost_price'] = 0
                 else:
                     raise Exception(f"Could't find Key {b['Номенклатура_Key']} in cost_price on Date:{a['Date']}, Doc {a['Number']}")
