@@ -30,5 +30,14 @@ def find_from_to():
     #     date_time = datetime.strptime(str[:10], '%Y-%m-%d')
     #     print(date_time.date())
 
+def get_product_by_id(id):
+    catalog = f"Catalog_Номенклатура(Ref_Key=guid'{id}')"
+    select = ''
+    filt = ''
+    res = request_jason_data(catalog, select, filt)
+    print(res['Code'], res['Description'], res['DeletionMark'])
 
-find_from_to()
+
+# find_from_to()
+get_product_by_id('5e24bf7d-7a1a-11e4-87b0-005056950007')
+
