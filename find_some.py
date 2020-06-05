@@ -37,7 +37,18 @@ def get_product_by_id(id):
     res = request_jason_data(catalog, select, filt)
     print(res['Code'], res['Description'], res['DeletionMark'])
 
+def get_return_receipts(start_date, end_date):
+    catalog = 'Document_ЧекККМ'
+    select = ''
+    filt = f"Date ge datetime'{start_date}' and Date le datetime'{end_date}' and " \
+           f"ЧекККМПродажа_Key ne guid'00000000-0000-0000-0000-000000000000'"
+    receipts_on_return = request_jason_data(catalog, select, filt)
+    for a in receipts_on_return['value']:
+        print(a['Number'])
+
 
 # find_from_to()
-get_product_by_id('aadf2951-a8ce-11e7-a937-005056950094')
-
+# get_product_by_id('aadf2951-a8ce-11e7-a937-005056950094')
+start_date = '2020-04-01T00:00:00'
+end_date = '2020-04-30T23:59:59'
+get_return_receipts(start_date, end_date)
