@@ -4,8 +4,8 @@ from datetime import datetime
 
 
 def main():
-    start_date = '2020-05-01T00:00:00'
-    end_date = '2020-05-10T23:59:59'
+    start_date = '2020-05-03T00:00:00'
+    end_date = '2020-05-03T23:59:59'
     departure_ref = '1e2039a3-da0a-11dc-b992-001bfcc2ffde'
 
     get_salary(start_date, end_date, departure_ref)
@@ -64,15 +64,16 @@ def get_salary(start_date, end_date, dep_ref):
         if len(receipts_on_return['value']) == 0:
             for b in a['Товары']:
                 # Получаем наименование товара
-                catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
-                select = 'Description'
-                filt = ''
-                res = request_jason_data(catalog, select, filt)
-                b['Name'] = (res['Description'])
+                # catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
+                # select = 'Description'
+                # filt = ''
+                # res = request_jason_data(catalog, select, filt)
+                # b['Name'] = (res['Description'])
 
                 date_string = a['Date']
                 receipt_date = datetime.strptime(date_string[:10], '%Y-%m-%d')
-                # Не учитываем с/с доставки
+                receipt_date_fd = receipt_date.replace()
+                # Не учитываем с/с доставки,
                 if b['Номенклатура_Key'] != '785ef93b-8e84-11e9-95f9-00505695411f' \
                         and b['Номенклатура_Key'] != 'aadf2951-a8ce-11e7-a937-005056950094'\
                         and b['Номенклатура_Key'] in sorted_cost_price[receipt_date]:
@@ -80,8 +81,10 @@ def get_salary(start_date, end_date, dep_ref):
                 elif b['Номенклатура_Key'] == '785ef93b-8e84-11e9-95f9-00505695411f' \
                         or b['Номенклатура_Key'] == 'aadf2951-a8ce-11e7-a937-005056950094':
                     b['cost_price'] = 0
-                else:
+                elif b['Номенклатура_Key'] in cost_price_period[receipt_date.replace(day=1)]:
+                    b['cost_price'] = cost_price_period[receipt_date.replace(day=1)][b['Номенклатура_Key']]
 
+                else:
                     raise Exception(f"Could't find Key {b['Номенклатура_Key']} in cost_price on Date:{a['Date']}, Doc {a['Number']}")
 
                 # print(f"{b['Name']} \t {b['Количество']} \t {b['Сумма']} \t {b['cost_price']} ")
@@ -128,20 +131,13 @@ def get_cost_price(start_date, end_date, dep_ref, type):
             str = a['Period']
             date = datetime.strptime(str[:10], '%Y-%m-%d')
             if type != 'day':
-                date.replace(day=1)
+                date = date.replace(day=1)
             if date in sorted_cost_price:
-                sorted_cost_price[date].update({a['Номенклатура_Key']: a['Стоимость']/a['Количество']})
+                sorted_cost_price[date].update({a['Номенклатура_Key']: round(a['Стоимость']/a['Количество'], 2)})
             else:
-                sorted_cost_price[date] = {a['Номенклатура_Key']: a['Стоимость']/a['Количество']}
+                sorted_cost_price[date] = {a['Номенклатура_Key']: round(a['Стоимость']/a['Количество'], 2)}
 
     return sorted_cost_price
-
-
-def get_last_cost(product_ref):
-    # /odata/standard.odata/Catalog_Товары?$orderby = Наименование asc &$skip = 2?$top = 11
-    catalog = 'AccumulationRegister_ПродажиСебестоимость_RecordType'
-    select = 'Recorder_Type, Подразделение_Key, Period, Номенклатура_Key, Стоимость, Количество'
-    filt = f"Period ge datetime'{start_date}' and Period le datetime'{end_date}'"
 
 
 def request_jason_data(catalog, select, r_filter):

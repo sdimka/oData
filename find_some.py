@@ -108,3 +108,4 @@ print(res)
 for a in res['value']:
     print(round(a['Стоимость']/a['Количество'], 2))
 
+
