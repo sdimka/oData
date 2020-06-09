@@ -1,6 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
+from decimal import *
 
 
 def main():
@@ -44,14 +45,14 @@ def get_salary(start_date, end_date, dep_ref):
     sorted_cost_price = get_cost_price(start_date, end_date, dep_ref, 'day')
     cost_price_period = get_cost_price(start_date, end_date, dep_ref, 'period')
 
-    total_cost_price = 0
-    total_price = 0
-    total_quantity = 0
+    total_cost_price = Decimal('0')
+    total_price = Decimal('0')
+    total_quantity = Decimal('0')
 
     for a in filtered_res:
-        doc_price = 0
-        doc_quantity = 0
-        doc_cost_price = 0
+        doc_price = Decimal('0')
+        doc_quantity = Decimal('0')
+        doc_cost_price = Decimal('0')
         # print(a['Number'])
         # print(a['Ref_Key'])
 
@@ -64,11 +65,11 @@ def get_salary(start_date, end_date, dep_ref):
         if len(receipts_on_return['value']) == 0:
             for b in a['Товары']:
                 # Получаем наименование товара
-                # catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
-                # select = 'Description'
-                # filt = ''
-                # res = request_jason_data(catalog, select, filt)
-                # b['Name'] = (res['Description'])
+                catalog = f"Catalog_Номенклатура(Ref_Key=guid'{b['Номенклатура_Key']}'"
+                select = 'Description'
+                filt = ''
+                res = request_jason_data(catalog, select, filt)
+                b['Name'] = (res['Description'])
 
                 date_string = a['Date']
                 receipt_date = datetime.strptime(date_string[:10], '%Y-%m-%d')
@@ -87,13 +88,12 @@ def get_salary(start_date, end_date, dep_ref):
                 else:
                     raise Exception(f"Could't find Key {b['Номенклатура_Key']} in cost_price on Date:{a['Date']}, Doc {a['Number']}")
 
-                # print(f"{b['Name']} \t {b['Количество']} \t {b['Сумма']} \t {b['cost_price']} ")
-                total_cost_price += b['cost_price'] * b['Количество']
+                total_cost_price = total_cost_price + Decimal(str(b['cost_price'] * b['Количество']))
                 total_price += b['Сумма']
                 total_quantity += b['Количество']
                 doc_price += b['Сумма']
                 doc_quantity += b['Количество']
-                doc_cost_price += b['cost_price'] * b['Количество']
+                doc_cost_price = doc_cost_price + Decimal(str(b['cost_price'] * b['Количество']))
         else:
             print("Have receipt on return!")
             ddd = [val for val in receipts_on_return['value']]
@@ -103,7 +103,7 @@ def get_salary(start_date, end_date, dep_ref):
             else:
                 print('Better to recalcs')
 
-        # print(f"{a['Number']} По доку: Цена: {doc_price}, Кол-во: {doc_quantity}, С/С: {doc_cost_price}")
+        print(f"{a['Number']} По доку: Цена: {doc_price}, Кол-во: {doc_quantity}, С/С: {doc_cost_price}")
 
     print(f'Всего: Цена: {total_price}, Кол-во: {total_quantity}, С/С: {total_cost_price}')
 
