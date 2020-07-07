@@ -3,6 +3,8 @@ from flask_api import status
 from flask_cors import CORS
 import json
 
+from datetime import datetime
+
 from order import order
 
 app = Flask(__name__)
@@ -38,6 +40,10 @@ def get_list():
 
 @app.route('/getOrders/', methods=['GET'])
 def get_order_list():
+    # today = (datetime.today() + '')[0-]
+    start_date = datetime.strptime(request.args.get('startDate', default='', type=str), '%d/%m/%Y')
+    end_date = datetime.strptime(request.args.get('endDate', default='', type=str), '%d/%m/%Y')
+    print(start_date)
     res = json.dumps([order.__dict__ for order in orders])
     return res
 

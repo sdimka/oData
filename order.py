@@ -1,3 +1,4 @@
+
 class order:
     def __init__(self, id, date, number, client, sum, isPayed, payType):
         self.id = number;
