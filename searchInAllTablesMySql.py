@@ -1,7 +1,7 @@
 import mysql.connector
 import time
 
-search_value = "9431814"
+search_value = "2573"
 
 db_connection = mysql.connector.connect(
   host="192.168.1.180",
@@ -25,9 +25,9 @@ def get_columns(table_name):
 
 def get_value(table, column, value):
     result = []
-    s_string = "%" + value + "%"
+    s_string = '"%' + value + '%"'
     try:
-        db_cursor.execute(f'SELECT * FROM {table} WHERE {column} like "%943 18 14%"')
+        db_cursor.execute(f'SELECT * FROM {table} WHERE {column} like {s_string}')  # "%943 18 14%"
         result = [column[0] for column in db_cursor.fetchall()]
     except mysql.connector.Error as err:
         print("Something went wrong: {}".format(err))
