@@ -1,7 +1,7 @@
 import mysql.connector
 import time
 
-search_value = "2573"
+search_value = "192.168.1.241"
 
 db_connection = mysql.connector.connect(
   host="192.168.1.180",
