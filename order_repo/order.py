@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
 from order_repo import Base
 
@@ -16,11 +16,19 @@ class Order(Base):
     date = Column(DateTime)
     number = Column(Integer)
     # client -
-    customer_id = Column(Integer, ForeignKey('customer.id'))
     # customer = relationship("Customer", back_populates="orders")
-    customer = relationship("Customer", backref=backref("orders", uselist=False))
+
+    # customer_id = Column(Integer, ForeignKey('customer.id'))
+    # customer = relationship("Customer", backref=backref("orders", uselist=False))
+
+    # customer_id = Column(Integer, ForeignKey('customer.id'))
+    # customer = relationship("Customer", backref="orders")
+
+    # customer_id = Column(Integer, ForeignKey('customer.id'))
+    # customer = relationship("Customer")
     # products -
-    products = relationship("Product", order_by=Product.id, back_populates="orders")
+    # products = relationship("Product", order_by=Product.id, back_populates="orders")
+    # products = relationship("Product")
     total_sum = Column(DECIMAL(18, 4))
     total_quantity = Column(DECIMAL(18, 4))
     isPayed = Column(Boolean)

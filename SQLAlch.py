@@ -25,9 +25,11 @@ class Invoice(Base):
     __tablename__ = 'invoices'
 
     id = Column(Integer, primary_key=True)
-    custid = Column(Integer, ForeignKey('customers.id'))
     invno = Column(Integer)
     amount = Column(Integer)
+
+
+    custid = Column(Integer, ForeignKey('customers.id'))
     customer = relationship("Customer", back_populates="invoices")
 
 
@@ -37,10 +39,10 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# c1 = Customers(date=datetime.now(), name='Ravi Kumar', address='Station Road Nanded', email='ravi@gmail.com')
-#
-# session.add(c1)
-# session.commit()
+c1 = Customer(date=datetime.now(), name='Raavi Kumar', address='Station Road Nanded', email='ravi@gmail.com')
+c1.invoices = [Invoice(invno=10, amount=15000), Invoice(invno=14, amount=3850)]
+session.add(c1)
+session.commit()
 #
 # session.add_all([
 #     Customers(date=datetime.now(), name='Komal Pande', address='Koti, Hyderabad', email='komal@gmail.com'),
