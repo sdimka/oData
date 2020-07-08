@@ -30,7 +30,8 @@ class Invoice(Base):
     amount = Column(Integer)
     customer = relationship("Customer", back_populates="invoices")
 
-Customer.invoices = relationship("Invoice", order_by = Invoice.id, back_populates = "customer")
+
+Customer.invoices = relationship("Invoice", order_by=Invoice.id, back_populates="customer")
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
