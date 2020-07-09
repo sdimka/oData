@@ -7,6 +7,7 @@ from order_repo import Base
 class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True)
+    bit_id = (Integer)
     name = Column(String(50))
     last_name = Column(String(50))
     e_mail = Column(String(50))

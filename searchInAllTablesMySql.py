@@ -1,7 +1,9 @@
 import mysql.connector
 import time
+from datetime import datetime, date, timedelta
 
-search_value = "192.168.1.241"
+search_value = "2020-06-23 22:49:18"
+#  23.06.2020 21:56:48
 
 db_connection = mysql.connector.connect(
   host="192.168.1.180",
@@ -26,14 +28,26 @@ def get_columns(table_name):
 def get_value(table, column, value):
     result = []
     s_string = '"%' + value + '%"'
+    # dt = datetime.strptime(search_value, '%d.%m.%Y %H:%M:%S')
     try:
-        db_cursor.execute(f'SELECT * FROM {table} WHERE {column} like {s_string}')  # "%943 18 14%"
+        db_cursor.execute(f'SELECT * FROM {table} WHERE {column} like {s_string}')  # "%943 18 14%" change "=" to "like"
         result = [column[0] for column in db_cursor.fetchall()]
     except mysql.connector.Error as err:
         print("Something went wrong: {}".format(err))
         print(f'Table: {table}, Column: {column}')
     # return [column[0] for column in db_cursor.fetchall()]
     return result
+
+
+def search_in_datetime_fields(table, column, value):
+    q_string = f"SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{table}' AND COLUMN_NAME = '{column}';"
+    db_cursor.execute(q_string)
+
+    if [column[0] for column in db_cursor.fetchall()][0] == 'datetime':
+        db_cursor.execute(f'SELECT * FROM {table} WHERE {column} = "{value}"')
+        return [column[0] for column in db_cursor.fetchall()]
+    return []
+
 
 def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     """
@@ -56,28 +70,27 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     if iteration == total:
         print()
 
+
 if __name__ == "__main__":
     tables = get_tables()
 
     l = len(tables)
     count = 0
 
-    # Initial call to print 0% progress
-    # printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
-    # for i, item in enumerate(items):
-    #     # Do stuff...
-    #     time.sleep(0.1)
-    #     # Update Progress Bar
-    #     printProgressBar(i + 1, l, prefix='Progress:', suffix='Complete', length=50)
+    # Для поиска даты:
+    dt = datetime.strptime(search_value, '%Y-%m-%d %H:%M:%S')
+
     total = []
     printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
     for a in tables:
         columns = get_columns(a)
         count += 1
         for b in columns:
-            res = get_value(a, b, search_value)
+            # res = get_value(a, b, search_value)
+            res = search_in_datetime_fields(a, b, dt)
             if len(res) > 0:
                 total.append(f'Table: {a}, Column: {b}, Row: {res}')
-        printProgressBar(count , l, prefix='Progress:', suffix='Complete', length=50)
+        printProgressBar(count, l, prefix='Progress:', suffix='Complete', length=50)
 
-    print(total)
+    for a in total:
+        print(a)

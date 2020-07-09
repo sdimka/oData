@@ -49,7 +49,6 @@ def get_order_list():
     # res = json.dumps([order.__dict__ for order in fake_orders])
     lst = bd.get_list()
     res = jsonify(list(map(lambda ord: ord.serialize(), lst)))
-    # res = jsonify({'order': list(map(lambda ord: ord.serialize(), lst))})
 
     return res
 

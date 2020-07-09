@@ -8,7 +8,12 @@ class Order(Base):
     __tablename__ = 'orders'
     id = Column(Integer, primary_key=True)
     date = Column(DateTime)
+    fuser_id = Column(Integer)  # for bitrix synchronization
     number = Column(Integer)
+
+    delivery_price = Column(Integer)
+    canceled = Column(Boolean)
+    status_id = Column(String)
     # client -
     customer_id = Column(Integer, ForeignKey('customers.id'))
     customer = relationship("Customer", back_populates="orders")
