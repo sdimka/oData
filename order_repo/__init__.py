@@ -14,8 +14,6 @@ from .order import Order
 from .product import Product
 from .customer import Customer
 
-Order.products = relationship("Product", order_by=Product.id, back_populates="orders")
-
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)

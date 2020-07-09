@@ -6,30 +6,26 @@ from order_repo import Base
 
 class Order(Base):
     __tablename__ = 'orders'
-
-    # date = Column(DateTime)
-    # name = Column(String(25))
-    # address = Column(String(25))
-    # email = Column(String(25))
-
     id = Column(Integer, primary_key=True)
     date = Column(DateTime)
     number = Column(Integer)
     # client -
-    # customer = relationship("Customer", back_populates="orders")
+    customer_id = Column(Integer, ForeignKey('customers.id'))
+    customer = relationship("Customer", back_populates="orders")
 
-    # customer_id = Column(Integer, ForeignKey('customer.id'))
-    # customer = relationship("Customer", backref=backref("orders", uselist=False))
-
-    # customer_id = Column(Integer, ForeignKey('customer.id'))
-    # customer = relationship("Customer", backref="orders")
-
-    # customer_id = Column(Integer, ForeignKey('customer.id'))
-    # customer = relationship("Customer")
     # products -
-    # products = relationship("Product", order_by=Product.id, back_populates="orders")
-    # products = relationship("Product")
+    products = relationship("Product", back_populates="order")
+
     total_sum = Column(DECIMAL(18, 4))
     total_quantity = Column(DECIMAL(18, 4))
     isPayed = Column(Boolean)
     payType = Column(Integer)
+
+    def serialize(self):
+        return {'id': self.id,
+                'date': self.date,
+                'number': self.number,
+                'client': str(self.customer.name + ' ' + self.customer.last_name),
+                'sum': float(self.total_sum),
+                'isPayed': self.isPayed,
+                'payType': self.payType}

@@ -1,15 +1,27 @@
-# from order_repo import Order, Product, Customer, session
+import bd_engine as bd
+from datetime import datetime, date, timedelta
+
+bd.fake_bd_gen()
+# dt = date.today() - timedelta(5)
+# print(dt)
+
+
+
+
+#from order_repo import Order, Product, Customer, session
 # from datetime import datetime, date, time
 #
 #
-# # c1 = Customer(name='Ravi Kumar', e_mail='Station Road Nanded', phone='ravi@gmail.com')
-# # p1 = Product(quantity=2, price=150, name='Краска Socolor.beauty UL-AJ пепельный нефритовый ультраосвтеляющий оттенок 90мл MATRIX')
-# # o1 = Order(date= datetime.now(), customer=c1, products=[p1, p1])
-# o1 = Order(date=datetime.now())
+# o1 = Order(date=datetime.now(), number=154)
+# o1.customer = Customer(name='Ivanov Ivan', e_mail='sss@mmm.com')
+# o1.products = [Product(name='Супер крем', quantity=2, price=25), Product(name='Супер ifvgeym', quantity=3, price=15)]
 #
 # session.add(o1)
 # session.commit()
 
+
+
+"""
 from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Boolean
 from sqlalchemy import create_engine, ForeignKey
 
@@ -64,8 +76,6 @@ class Product(Base):
     order = relationship("Order", back_populates="products")
 
 
-# Order.products = relationship("Product", order_by=Product.id, back_populates="order")
-
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
@@ -77,3 +87,4 @@ o1.products = [Product(name='Супер крем', quantity=2, price=25), Produc
 
 session.add(o1)
 session.commit()
+"""
