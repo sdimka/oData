@@ -12,10 +12,10 @@ db_connection = mysql.connector.connect(
 db_cursor = db_connection.cursor()
 
 
-def last_baskets():
+def last_baskets():  # DESC LIMIT 500
     q_string = 'SELECT FUSER_ID, COUNT(*) ' \
                'FROM(' \
-               'SELECT * FROM sitemanager.b_sale_basket ORDER BY id DESC LIMIT 10' \
+               'SELECT * FROM sitemanager.b_sale_basket ORDER BY id DESC' \
                ')sub ' \
                'GROUP BY FUSER_ID ' \
                'ORDER BY FUSER_ID ASC'
@@ -34,8 +34,38 @@ def order_inf_from_bit(fuser_id):
     q_string = f"SELECT DATE_INSERT, PRICE, USER_ID, CANCELED, STATUS_ID FROM b_sale_order WHERE ID ="
 
 
+double_list = []
 
-# bask_list = last_baskets()
-order_inf_from_bit(734422)
-order_inf_from_bit(642064)
+
+def search_double(fuser_id):
+    q_string = f"SELECT ORDER_ID, PRICE, NAME, QUANTITY FROM sitemanager.b_sale_basket WHERE FUSER_ID ='{fuser_id}'"
+    db_cursor.execute(q_string)
+    basket_data = []
+    for column in db_cursor.fetchall():
+        basket_data.append(column)
+    asa = [val[0] for val in basket_data]
+    if len(set(asa)) > 1:
+        double_list.append(fuser_id)
+
+
+def search_double_null(fuser_id):
+    q_string = f"SELECT ORDER_ID, PRICE, NAME, QUANTITY, SORT FROM sitemanager.b_sale_basket WHERE FUSER_ID ='{fuser_id}'"
+    db_cursor.execute(q_string)
+    basket_data = []
+    for column in db_cursor.fetchall():
+        if column[0] is None:
+            basket_data.append(column[4])
+    if len(basket_data) != len(set(basket_data)):
+        double_list.append(fuser_id)
+
+
+
+bask_list = last_baskets()
+
+# order_inf_from_bit(734422)
+# order_inf_from_bit(642064)
+for b in bask_list:
+    search_double_null(b)
+
+print(double_list)
 
