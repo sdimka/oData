@@ -32,6 +32,7 @@ class Order(Base):
                 'number': self.number,
                 'client': str(self.customer.name) + ' ' + str(self.customer.last_name),
                 'sum': float(self.total_sum),
+                'totalQuantity': float(self.total_quantity),
                 'isPayed': self.isPayed,
                 'payType': self.payType,
                 'status': self.order_status,

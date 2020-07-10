@@ -79,9 +79,16 @@ def collect_write_norm_order(f_user, order_id, count):
         c_order.customer = Customer(bit_id=bso_res[1], name=bu_res[0], last_name=bu_res[1], e_mail=bu_res[2],
                                     phone=bu_res[3], is_1C_resident=False)
 
-    # c_order.customer = Customer(bit_id=bso_res[1], name=bu_res[0], last_name=bu_res[1], e_mail=bu_res[2], phone=bu_res[3])
+    q_string = f"SELECT NAME, QUANTITY, PRICE FROM sitemanager.b_sale_basket WHERE ORDER_ID = {order_id}"
+    db_cursor.execute(q_string)
 
-    # c_order.products = []
+    total_quantity = 0
+    for prd in db_cursor.fetchall():
+        c_order.products.append(Product(name=prd[0], quantity=prd[1], price=prd[2]))
+        total_quantity += prd[1]
+    c_order.total_quantity = total_quantity
+
+
     session.add(c_order)
     session.commit()
 

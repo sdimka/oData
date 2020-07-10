@@ -14,3 +14,11 @@ class Product(Base):
 
     order_id = Column(Integer, ForeignKey('orders.id'))
     order = relationship("Order", back_populates="products")
+
+    def serialize(self):
+        return {'id': self.id,
+                'name': self.name,
+                'quantity': float(self.quantity),
+                'price': float(self.price),
+                'cost_price': self.cost_price if self.cost_price is not None else ''
+                }

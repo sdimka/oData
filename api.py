@@ -42,13 +42,19 @@ def get_list():
 
 @app.route('/getOrders/', methods=['GET'])
 def get_order_list():
-    # today = (datetime.today() + '')[0-]
     start_date = datetime.strptime(request.args.get('startDate', default='', type=str), '%d/%m/%Y')
     end_date = datetime.strptime(request.args.get('endDate', default='', type=str), '%d/%m/%Y')
     # res = json.dumps([order.__dict__ for order in fake_orders])
     lst = bd.get_list(start_date, end_date)
     res = jsonify(list(map(lambda ord: ord.serialize(), lst)))
+    return res
 
+
+@app.route('/getProducts/', methods=['GET'])
+def get_products_list():
+    order_id = request.args.get('id', default='', type=int)
+    prod = bd.get_products(order_id)
+    res = jsonify(list(map(lambda prd: prd.serialize(), prod)))
     return res
 
 
