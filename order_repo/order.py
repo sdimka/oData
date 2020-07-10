@@ -8,12 +8,12 @@ class Order(Base):
     __tablename__ = 'orders'
     id = Column(Integer, primary_key=True)
     date = Column(DateTime)
-    fuser_id = Column(Integer)  # for bitrix synchronization
-    number = Column(Integer)
+    b_fuser_id = Column(Integer)  # for bitrix synchronization
+    number = Column(Integer)  # bitrix order_id
 
     delivery_price = Column(Integer)
-    canceled = Column(Boolean)
-    status_id = Column(String)
+    order_status = Column(Integer)  # 1 - normal, 2 - canceled, 3 - abandoned
+    b_status_id = Column(String(2))  # from bitrix
     # client -
     customer_id = Column(Integer, ForeignKey('customers.id'))
     customer = relationship("Customer", back_populates="orders")
@@ -30,7 +30,10 @@ class Order(Base):
         return {'id': self.id,
                 'date': self.date,
                 'number': self.number,
-                'client': str(self.customer.name + ' ' + self.customer.last_name),
+                'client': str(self.customer.name) + ' ' + str(self.customer.last_name),
                 'sum': float(self.total_sum),
                 'isPayed': self.isPayed,
-                'payType': self.payType}
+                'payType': self.payType,
+                'status': self.order_status,
+                'isResident': self.customer.is_1C_resident}
+

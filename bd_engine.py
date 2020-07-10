@@ -23,5 +23,7 @@ def fake_bd_gen():
     session.commit()
 
 
-def get_list():
-    return session.query(Order)
+def get_list(startDate, endDate):
+    sDate = datetime.combine(startDate, datetime.min.time())
+    eDate = datetime.combine(endDate, datetime.max.time())
+    return session.query(Order).filter(Order.date >= sDate).filter(Order.date <= eDate).order_by(Order.number.desc())

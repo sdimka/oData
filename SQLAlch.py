@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime, date, time
 
 engine = create_engine('mysql+mysqlconnector://root:mypassword@192.168.1.180')
-engine.execute("CREATE DATABASE IF NOT EXISTS alchem")  # create db
-engine.execute("USE alchem")
+engine.execute("CREATE DATABASE IF NOT EXISTS alchem1")  # create db
+engine.execute("USE alchem1")
 Base = declarative_base()
 
 
@@ -39,10 +39,12 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-c1 = Customer(date=datetime.now(), name='Raavi Kumar', address='Station Road Nanded', email='ravi@gmail.com')
-c1.invoices = [Invoice(invno=10, amount=15000), Invoice(invno=14, amount=3850)]
-session.add(c1)
-session.commit()
+# c1 = Customer(date=datetime.now(), name='Raavi Kumar', address='Station Road Nanded', email='ravi@gmail.com')
+# c1.invoices = [Invoice(invno=10, amount=15000), Invoice(invno=14, amount=3850)]
+# session.add(c1)
+# session.commit()
+
+
 #
 # session.add_all([
 #     Customers(date=datetime.now(), name='Komal Pande', address='Koti, Hyderabad', email='komal@gmail.com'),
@@ -53,7 +55,6 @@ session.commit()
 
 result = session.query(Customer).filter(Customer.name == 'Komal Pande').\
     filter(Customer.date == '2020-07-08 01:08:52')
-
 for row in result:
     print("Date:", row.date, "Name: ", row.name, "Address:", row.address, "Email:", row.email)
 
@@ -64,7 +65,7 @@ for row in result:
 
 result = session.query(Customer).filter(Customer.id > 2, Customer.name.like('Ra%'))
 for row in result:
-   print ("ID:", row.id, "Name: ",row.name, "Address:",row.address, "Email:",row.email)
+   print("ID:", row.id, "Name: ",row.name, "Address:",row.address, "Email:",row.email)
 
 c1 = session.query(Customer).get(1)
 print("ID:", c1.id, "Name: ", c1.name, "Address:", c1.address, "Email:", c1.email, c1.invoices)
