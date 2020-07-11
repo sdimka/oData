@@ -145,6 +145,7 @@ def request_jason_data(catalog, select, r_filter):
                      f'$format=json&' \
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
+    print(request_string)
     n_res = requests.get(request_string, auth=HTTPBasicAuth('sd', '12345'))
     n_res.encoding = 'utf-8'
     j_data = n_res.json()

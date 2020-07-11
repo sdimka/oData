@@ -1,16 +1,14 @@
 from getCostPriceOfSalary import request_jason_data
 from datetime import datetime
-import requests
-from requests.auth import HTTPBasicAuth
 
 
-def find_from_to():
+def find_from_to():  # Поиск чека на возврат?
     START_DATE = '2020-05-01T00:00:00'
-    END_DATE = '2020-05-30T23:59:59'
+    END_DATE = '2020-05-01T23:59:59'
     catalog = 'Document_ЧекККМ'
     select = ''
     filt = f"Date ge datetime'{START_DATE}' and Date le datetime'{END_DATE}' " \
-        f"and ЧекККМПродажа_Key ne guid'00000000-0000-0000-0000-000000000000'"
+       f"and ЧекККМПродажа_Key ne guid'00000000-0000-0000-0000-000000000000'"
     req = request_jason_data(catalog, select, filt)
 
     second_list = []
@@ -31,6 +29,7 @@ def find_from_to():
     #     str = a['Date']
     #     date_time = datetime.strptime(str[:10], '%Y-%m-%d')
     #     print(date_time.date())
+
 
 def get_product_by_id(id):
     catalog = f"Catalog_Номенклатура(Ref_Key=guid'{id}')"
@@ -96,16 +95,16 @@ def get_last_cost(product_ref, departure_ref):
     return n_res
 
 
-# find_from_to()
-get_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
-start_date = '2020-05-01T00:00:00'
-end_date = '2020-05-10T23:59:59'
+find_from_to()
+# get_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
+# start_date = '2020-05-01T00:00:00'
+# end_date = '2020-05-10T23:59:59'
 # get_return_receipts(start_date, end_date)
 # cost_price_by_day(start_date, end_date)
 # test()
-res = get_last_cost('e93b7176-7e3c-11dd-a8e6-0019992accca', '1e2039a3-da0a-11dc-b992-001bfcc2ffde')
-print(res)
-for a in res['value']:
-    print(round(a['Стоимость']/a['Количество'], 2))
+# res = get_last_cost('e93b7176-7e3c-11dd-a8e6-0019992accca', '1e2039a3-da0a-11dc-b992-001bfcc2ffde')
+# print(res)
+# for a in res['value']:
+#     print(round(a['Стоимость']/a['Количество'], 2))
 
 
