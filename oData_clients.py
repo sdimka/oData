@@ -1,11 +1,49 @@
 from getCostPriceOfSalary import request_jason_data
+from datetime import datetime, date, timedelta
+
+from order_repo import Order, Product, Customer, session
 
 #  Catalog_Контрагенты
 
 # Запрос одного элемента:
 # http://192.168.1.108/mayco/odata/standard.odata/InformationRegister_КонтактнаяИнформация&$top=1&$format=json
 
-# Чеки за период -> Дисконтная карта -> Контрагент -> контакты -> фильтр телефонов - сравнение
+# ID Подразделения -> Чеки за период (лист Дисконтная карта) -> Контрагент (лист) -> Если нет, записываем в БД
+#
+# При загрузке с сайте контакты -> фильтр телефонов -> сравнение
+#
+total_list = []
+
+def main():
+
+    for i in range(90):
+        d = date(year=2018, month=1, day=1) + timedelta(days=i)
+
+        start_date = f"{d.year}-{('%02d' % d.month)}-{('%02d' % d.day)}T00:00:00"
+        end_date = f"{d.year}-{('%02d' % d.month)}-{('%02d' % d.day)}T23:59:59"
+
+        print(start_date)
+
+        for depart in dep_name_list.values():
+            print(depart)
+            # номера карт по чекам
+            inf_card_nums = get_recipe_by_period(start_date, end_date,
+                                                 get_department_id_by_code(depart))
+            # номера клиентов из карт
+            client_number_list = []
+            for card_num in inf_card_nums:
+                client_number_list.append(get_client_by_inf_card(card_num))
+
+            #  Получаем клиента, если нет в базе, получаем контактную инфу, записываем
+            for client_number in client_number_list:
+                client_info = get_client_by_code(client_number)
+                get_contact_reg_info(client_number)
+
+    for error in total_list:
+        print(error)
+
+    # print(get_client_by_code('dbd853bf-a8e5-11e3-82a7-005056950007'))
+
 
 
 def get_client_by_code(code):
@@ -16,14 +54,15 @@ def get_client_by_code(code):
     :return:
     """
     catalog = f"Catalog_Контрагенты(Ref_Key=guid'{code}')"
-    select = ''
+    select = 'Code, НаименованиеПолное, ДатаСоздания'
     filt = ''
     req = request_jason_data(catalog, select, filt)
-    print('Клиент:', req['Ref_Key'], req['Code'])
-    get_contact_reg_info(req['Ref_Key'])
+
+    # get_contact_reg_info(req['Ref_Key'])
+    return req
 
 
-def get_contact_reg_info(code):
+def get_contact_reg_info(client_code):
     #  Использовать "ПолеПоискаПоТелефону"
     #  http://192.168.1.108/mayco/odata/standard.odata/InformationRegister_КонтактнаяИнформация
     #  (Объект='e7e66f48-cf94-11e7-a937-005056950094',
@@ -31,7 +70,7 @@ def get_contact_reg_info(code):
     #  Тип = 'Телефон',
     #  Вид=guid'968558ff-8fe0-40d0-84e3-ca694acbc839',
     #  Вид_Type='StandardODATA.Catalog_ВидыКонтактнойИнформации')
-    catalog = f"InformationRegister_КонтактнаяИнформация(Объект='{code}', " \
+    catalog = f"InformationRegister_КонтактнаяИнформация(Объект='{client_code}', " \
               f"Объект_Type='StandardODATA.Catalog_Контрагенты', " \
               f"Тип = 'Телефон', " \
               f"Вид=guid'968558ff-8fe0-40d0-84e3-ca694acbc839', " \
@@ -39,36 +78,31 @@ def get_contact_reg_info(code):
     select = ''
     filt = ''
     req = request_jason_data(catalog, select, filt)
-    print(req)
-    # print(req['Представление'], req['ПолеПоискаПоТелефону'])
+    if 'Представление' in req:
+        pass  # print(req['Представление'], req['ПолеПоискаПоТелефону'])
+    else:
+        total_list.append(client_code)
 
 
-def search_recipe_by_period(dep_code):  # и не нулевой картой
-    START_DATE = '2020-03-01T00:00:00'
-    END_DATE = '2020-03-01T23:59:59'
+def get_recipe_by_period(start_date, end_date, dep_code):  # возвращаем дисконтные карты из чеков
     catalog = 'Document_ЧекККМ'
     select = ''
-    filt = f"Date ge datetime'{START_DATE}' and Date le datetime'{END_DATE}' and Подразделение_Key eq guid'{dep_code}'"
+    filt = f"Date ge datetime'{start_date}' and Date le datetime'{end_date}' and Подразделение_Key eq guid'{dep_code}'"
     req = request_jason_data(catalog, select, filt)
-    print(req)
+    result = []
     for a in req['value']:
         if a['ДисконтнаяКарта_Key'] != '00000000-0000-0000-0000-000000000000':
-            # print(a['ДисконтнаяКарта_Key'])
-            # print(a)
-            print('Номерчека: ', a['Number'])
-            # search_inf_card(a['ДисконтнаяКарта_Key'])
+            result.append(a['ДисконтнаяКарта_Key'])
+    return result
 
 
-def search_inf_card(card_num):
+def get_client_by_inf_card(card_num):  # код клиента из инф карты
     # Catalog_ИнформационныеКарты
     catalog = f"Catalog_ИнформационныеКарты(Ref_Key=guid'{card_num}')"
     select = ''
     filt = ''
     req = request_jason_data(catalog, select, filt)
-    get_client_by_code(req['ВладелецКарты'])
-    # print(req['ВладелецКарты'])
-    # for a in req:
-    #     print(a)
+    return req['ВладелецКарты']
 
 
 def get_department_id_by_code(code):
@@ -83,16 +117,15 @@ def get_department_id_by_code(code):
 # get_contact_reg_info('e7e66f48-cf94-11e7-a937-005056950094')
 
 
-dep_name_list = {'Магазин Богатырский' : 'ОП0000002', 'Магазин Гулливер': 'ИТС000024', 'Магазин Девяткино': 'АА0000017',
-                 'Магазин Заневский': 'ИТС000022', 'Магазин Лондон Молл': 'АА0000025', 'Магазин Меркурий': 'АА0000015',
+dep_name_list = {'Магазин Богатырский': 'ОП0000002'
+    , 'Магазин Гулливер': 'ИТС000024',
+                 'Магазин Заневский': 'ИТС000022', 'Магазин Лондон Молл': 'АА0000025',
                  'Магазин Порт Находка': 'АА0000026', 'Магазин РодеоДрайв': 'ИТС000027', 'Магазин Рубикон': 'ОП0000003',
                  'Магазин Французский бульвар': 'АА0000024', 'Магазин Звездный': 'АА0000018', 'Магазин Международный' : 'АА0000012',
                  'Магазин Нахимова': 'АА0000020', 'Магазин ОКей Пулково': 'ИТС000026', 'Магазин Оккервиль': 'ОП0000004',
                  'Магазин Стачек': 'АА0000022', 'Магазин Типанова': 'ЛС0000001', 'Магазин Электросила': 'ОП0000006',
                  }
 
-search_recipe_by_period(
-    get_department_id_by_code(dep_name_list['Магазин Заневский']))
 
-# for a in dep_name_list.values():
-#     print(get_department_id_by_code(a))
+if __name__ == '__main__':
+    main()
