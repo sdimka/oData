@@ -12,7 +12,7 @@ class Product(Base):
     price = Column(DECIMAL(18, 4))
     cost_price = Column(DECIMAL(18, 4))
 
-    order_id = Column(Integer, ForeignKey('orders.id'))
+    order_id = Column(Integer, ForeignKey('orders.id'), index=True)
     order = relationship("Order", back_populates="products")
 
     def serialize(self):
