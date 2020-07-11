@@ -10,6 +10,8 @@ class Customer1c(Base):
     code_1c = Column(String(9), index=True)  # АА0217499
     id_1c = Column(String(36))  # abc543af-eddf-11e2-809a-005056950007
     name = Column(String(255))
+    phone = Column(String(25))
+    phone_for_search = Column(String(25))
     dateCreate = Column(DateTime)
 
     customer = relationship("Customer", back_populates="customer1c")

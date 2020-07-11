@@ -1,7 +1,7 @@
 from getCostPriceOfSalary import request_jason_data
 from datetime import datetime, date, timedelta
 
-from order_repo import Order, Product, Customer, session
+from order_repo import Customer1c, session
 
 #  Catalog_Контрагенты
 
@@ -16,7 +16,7 @@ total_list = []
 
 def main():
 
-    for i in range(90):
+    for i in range(60):
         d = date(year=2018, month=1, day=1) + timedelta(days=i)
 
         start_date = f"{d.year}-{('%02d' % d.month)}-{('%02d' % d.day)}T00:00:00"
@@ -37,8 +37,21 @@ def main():
             #  Получаем клиента, если нет в базе, получаем контактную инфу, записываем
             for client_number in client_number_list:
                 client_info = get_client_by_code(client_number)
-                get_contact_reg_info(client_number)
+                customer1c = session.query(Customer1c).filter(Customer1c.code_1c == client_info['Code']).scalar()
+                if customer1c is None:
+                    reg_info = get_contact_reg_info(client_number)
+                    new_customer = Customer1c(code_1c=client_info['Code'], id_1c=client_number,
+                                              name=client_info['НаименованиеПолное'],
+                                              dateCreate=client_info['ДатаСоздания'])
 
+                    try:
+                        new_customer.phone = reg_info[0]
+                        new_customer.phone_for_search = reg_info[1]
+                    except TypeError:
+                        new_customer.phone = ''
+                        new_customer.phone_for_search = ''
+                    session.add(new_customer)
+            session.commit()
     for error in total_list:
         print(error)
 
@@ -79,7 +92,7 @@ def get_contact_reg_info(client_code):
     filt = ''
     req = request_jason_data(catalog, select, filt)
     if 'Представление' in req:
-        pass  # print(req['Представление'], req['ПолеПоискаПоТелефону'])
+        return [req['Представление'], req['ПолеПоискаПоТелефону']]
     else:
         total_list.append(client_code)
 

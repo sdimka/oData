@@ -1,4 +1,4 @@
-__all__ = ['Order', 'Customer', 'Product', 'Customer1c']
+__all__ = ['Order', 'Customer', 'Product', 'Customer1c', 'session']
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
