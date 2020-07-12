@@ -1,7 +1,11 @@
 from getCostPriceOfSalary import request_jason_data
 from datetime import datetime, date, timedelta
 
+import sys, getopt
+
 from order_repo import Customer1c, session
+
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 #  Catalog_Контрагенты
 
@@ -14,10 +18,11 @@ from order_repo import Customer1c, session
 #
 total_list = []
 
-def main():
 
-    for i in range(60):
-        d = date(year=2018, month=1, day=1) + timedelta(days=i)
+def main(year, month, day, steps):
+
+    for i in range(steps):
+        d = date(year=year, month=month, day=day) + timedelta(days=i)
 
         start_date = f"{d.year}-{('%02d' % d.month)}-{('%02d' % d.day)}T00:00:00"
         end_date = f"{d.year}-{('%02d' % d.month)}-{('%02d' % d.day)}T23:59:59"
@@ -36,8 +41,18 @@ def main():
 
             #  Получаем клиента, если нет в базе, получаем контактную инфу, записываем
             for client_number in client_number_list:
+
+                #  toDo !!! Ошибочные карты !!!!
+                if client_number == '00000000-0000-0000-0000-000000000000':
+                    break
+
                 client_info = get_client_by_code(client_number)
-                customer1c = session.query(Customer1c).filter(Customer1c.code_1c == client_info['Code']).scalar()
+
+                try:
+                    customer1c = session.query(Customer1c).filter(Customer1c.code_1c == client_info['Code']).scalar()
+                except MultipleResultsFound:
+                    print('Error client code: ', client_info['Code'])
+                    sys.exit('Error message')
                 if customer1c is None:
                     reg_info = get_contact_reg_info(client_number)
                     new_customer = Customer1c(code_1c=client_info['Code'], id_1c=client_number,
@@ -45,13 +60,13 @@ def main():
                                               dateCreate=client_info['ДатаСоздания'])
 
                     try:
-                        new_customer.phone = reg_info[0]
+                        new_customer.phone = reg_info[0][:25]
                         new_customer.phone_for_search = reg_info[1]
                     except TypeError:
                         new_customer.phone = ''
                         new_customer.phone_for_search = ''
                     session.add(new_customer)
-            session.commit()
+                    session.commit()
     for error in total_list:
         print(error)
 
@@ -140,5 +155,20 @@ dep_name_list = {'Магазин Богатырский': 'ОП0000002'
                  }
 
 
+def incom_args(args):
+    opts, argm = getopt.getopt(args, 'y:m:d:s:', ['foperand', 'soperand'])
+    ls = {}
+    for opt, arg in opts:
+        ls[opt] = int(arg)
+    main(ls['-y'], ls['-m'], ls['-d'], ls['-s'])
+
+
 if __name__ == '__main__':
-    main()
+    # print(get_client_by_code('0004e0e6-5824-11e7-ace4-005056950094'))
+    # print(get_contact_reg_info('0004e0e6-5824-11e7-ace4-005056950094'))
+    # main()
+    if len(sys.argv[1:]) < 8:  # Just for testing
+        print('Wrong args!')
+        incom_args(['-y', '2018', '-m', '2', '-d', '17', '-s', '1'])
+    else:
+        incom_args(sys.argv[1:])

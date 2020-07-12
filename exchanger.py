@@ -1,4 +1,4 @@
-from order_repo import Order, Product, Customer, session
+from order_repo import Order, Product, Customer, Customer1c, session
 from datetime import datetime, date, timedelta
 
 import mysql.connector
@@ -88,14 +88,55 @@ def collect_write_norm_order(f_user, order_id, count):
         total_quantity += prd[1]
     c_order.total_quantity = total_quantity
 
-
     session.add(c_order)
     session.commit()
+
+
+total_find = 0
+doubles = []
+bad_phone_list = ['11111', '11111111111']
+
+
+def compare_customers_by_phone(phone_number):
+    global total_find
+    global doubles
+    global find_list
+    if phone_number is not None and phone_number not in bad_phone_list:
+        clear_phone_num = ''.join(x for x in phone_number if x.isdigit())
+        search = "%{}%".format(clear_phone_num[1:])
+        customer1c = session.query(Customer1c).filter(Customer1c.phone_for_search.like(search)).all()
+        if len(customer1c) > 1:
+            doubles.append([phone_number, clear_phone_num])
+        if customer1c is not None:
+            cur_customer1c: Customer1c = None
+            for cust in customer1c:
+                # Проверка и возврат того, кто свежее :)
+                if cur_customer1c is None or cur_customer1c.dateCreate < cust.dateCreate:
+                    cur_customer1c = cust
+                    total_find = total_find + 1
+            return cur_customer1c
+    return None
+
+
+def recheck_customers():
+    customers = session.query(Customer).all()
+    for customer in customers:
+        new1c_customer = compare_customers_by_phone(customer.phone)
+        if new1c_customer is not None:
+            customer.customer1c = new1c_customer
+            customer.is_1C_resident = True
+            session.add(customer)
+            session.commit()
 
 
 # d = date(year=2020, month=6, day=18) - timedelta(0)
 # day_basket_list(d)
 
-for i in range(10):
-    d = date(year=2020, month=6, day=23) - timedelta(i)
-    day_basket_list(d)
+# for i in range(35):
+#     d = date(year=2020, month=6, day=23) - timedelta(i)
+#     day_basket_list(d)
+
+recheck_customers()
+print(total_find)
+for a in doubles:
+    print(a)

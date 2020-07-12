@@ -2,8 +2,9 @@ import requests
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
 from decimal import *
+import sys
 
-
+from json.decoder import JSONDecodeError
 def main():
     start_date = '2020-05-03T00:00:00'
     end_date = '2020-05-03T23:59:59'
@@ -147,7 +148,12 @@ def request_jason_data(catalog, select, r_filter):
                      f'$filter=({r_filter})'
     n_res = requests.get(request_string, auth=HTTPBasicAuth('sd', '12345'))
     n_res.encoding = 'utf-8'
-    j_data = n_res.json()
+    try:
+        j_data = n_res.json()
+    except JSONDecodeError:
+        print(n_res)
+        print(request_string)
+        sys.exit('Error message')
     return j_data
 
 
