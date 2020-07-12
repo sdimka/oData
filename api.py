@@ -64,7 +64,7 @@ def get_user():
     data = request.get_json()
     if 'login' in data and 'password' in data:
         for a in user_list:
-            if data['login'] in a and a[data['login']] == data['password']:
+            if data['login'].lower() in a and a[data['login'].lower()] == data['password']:
                 print('Ok login!')
                 response = jsonify({'some': 'data'})
                 return response
