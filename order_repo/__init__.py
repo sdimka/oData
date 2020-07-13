@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 
-engine = create_engine('mysql+mysqlconnector://root:mypassword@192.168.1.180')
+engine = create_engine('mysql+mysqlconnector://root:mypassword@192.168.1.180', pool_recycle=3600)
 engine.execute("CREATE DATABASE IF NOT EXISTS alchem")  # create db
 engine.execute("USE alchem")
 Base = declarative_base()

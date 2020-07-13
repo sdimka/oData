@@ -30,7 +30,7 @@ class Order(Base):
         return {'id': self.id,
                 'date': self.date,
                 'number': self.number,
-                'client': str(self.customer.name) + ' ' + str(self.customer.last_name),
+                'client': (str(self.customer.name) if self.customer.name is not None else '') + ' ' + str(self.customer.last_name),
                 'sum': float(self.total_sum),
                 'totalQuantity': float(self.total_quantity),
                 'isPayed': self.isPayed,

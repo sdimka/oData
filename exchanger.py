@@ -3,12 +3,20 @@ from datetime import datetime, date, timedelta
 
 import mysql.connector
 
+# db_connection = mysql.connector.connect(
+#   host="192.168.1.180",
+#   user="root",
+#   passwd="mypassword",
+#   database="sitemanager"
+# )
+
 db_connection = mysql.connector.connect(
-  host="192.168.1.180",
-  user="root",
-  passwd="mypassword",
-  database="sitemanager"
+  host="77.222.60.182",
+  user="SD",
+  passwd="EvH(psZ#V+y~w5",
+  database="shpilkspb_bitrix"
 )
+
 db_cursor = db_connection.cursor()
 
 
@@ -17,7 +25,7 @@ def day_basket_list(day: date):
     day_end = datetime.combine(day, datetime.max.time())
     q_string = f"SELECT FUSER_ID, ORDER_ID, COUNT(*) " \
                f"FROM(" \
-               f"SELECT * FROM sitemanager.b_sale_basket " \
+               f"SELECT * FROM b_sale_basket " \
                f"WHERE DATE_INSERT >='{day_start}' AND DATE_INSERT <='{day_end}' " \
                f"ORDER BY id DESC)sub " \
                f"GROUP BY FUSER_ID, ORDER_ID ORDER BY FUSER_ID ASC"
@@ -54,7 +62,7 @@ def collect_write_norm_order(f_user, order_id, count):
         return
 
     q_string = f"SELECT DATE_INSERT, USER_ID, PRICE, PRICE_DELIVERY, CANCELED, STATUS_ID  " \
-               f"FROM sitemanager.b_sale_order where ID = {order_id}"
+               f"FROM b_sale_order where ID = {order_id}"
     db_cursor.execute(q_string)
     # print('Good', order_id, f_user)
     bso_res = db_cursor.fetchall()[0]
@@ -63,9 +71,9 @@ def collect_write_norm_order(f_user, order_id, count):
     if bso_res[4] == 'Y' or bso_res[5] == 'CF':
         correct_status = 2
 
-    correct_date = bso_res[0] + timedelta(hours=4)
+    correct_date = bso_res[0] #  + timedelta(hours=4)
 
-    q_string = f"SELECT NAME, LAST_NAME, EMAIL, PERSONAL_PHONE FROM sitemanager.b_user WHERE ID = {bso_res[1]}"
+    q_string = f"SELECT NAME, LAST_NAME, EMAIL, PERSONAL_PHONE FROM b_user WHERE ID = {bso_res[1]}"
     db_cursor.execute(q_string)
     bu_res = db_cursor.fetchall()[0]
 
@@ -79,7 +87,7 @@ def collect_write_norm_order(f_user, order_id, count):
         c_order.customer = Customer(bit_id=bso_res[1], name=bu_res[0], last_name=bu_res[1], e_mail=bu_res[2],
                                     phone=bu_res[3], is_1C_resident=False)
 
-    q_string = f"SELECT NAME, QUANTITY, PRICE FROM sitemanager.b_sale_basket WHERE ORDER_ID = {order_id}"
+    q_string = f"SELECT NAME, QUANTITY, PRICE FROM b_sale_basket WHERE ORDER_ID = {order_id}"
     db_cursor.execute(q_string)
 
     total_quantity = 0
@@ -118,8 +126,20 @@ def compare_customers_by_phone(phone_number):
     return None
 
 
-def recheck_customers():
+def recheck_all_customers():
     customers = session.query(Customer).all()
+    for customer in customers:
+        new1c_customer = compare_customers_by_phone(customer.phone)
+        if new1c_customer is not None:
+            customer.customer1c = new1c_customer
+            customer.is_1C_resident = True
+            session.add(customer)
+            session.commit()
+
+
+def recheck_last_10_customers():
+    # query = users.select().order_by(users.c.id.desc()).limit(5)
+    customers = session.query(Customer).order_by(Customer.id.desc()).limit(10)
     for customer in customers:
         new1c_customer = compare_customers_by_phone(customer.phone)
         if new1c_customer is not None:
@@ -132,11 +152,11 @@ def recheck_customers():
 # d = date(year=2020, month=6, day=18) - timedelta(0)
 # day_basket_list(d)
 
-# for i in range(35):
-#     d = date(year=2020, month=6, day=23) - timedelta(i)
-#     day_basket_list(d)
+for i in range(5):
+    d = date(year=2020, month=7, day=13) - timedelta(i)
+    day_basket_list(d)
 
-recheck_customers()
+recheck_last_10_customers()
 print(total_find)
 for a in doubles:
     print(a)

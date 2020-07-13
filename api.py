@@ -14,8 +14,9 @@ CORS(app)
 
 user_list = [
     {'sd': '12345'},
-    {'td': '54321'}
-    # {'aau': 'LVL86x'}
+    {'td': '54321'},
+    {'aau': 'LVL86x'},
+    {'dev': 'LVL68x'}
 ]
 
 fake_orders = []
