@@ -24,7 +24,7 @@ class Order(Base):
     total_sum = Column(DECIMAL(18, 4))
     total_quantity = Column(DECIMAL(18, 4))
     isPayed = Column(Boolean)
-    payType = Column(Integer)
+    payType = Column(Integer)  # 1 - сайт (ИП),
 
     def serialize(self):
         return {'id': self.id,

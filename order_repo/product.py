@@ -15,6 +15,8 @@ class Product(Base):
     order_id = Column(Integer, ForeignKey('orders.id'), index=True)
     order = relationship("Order", back_populates="products")
 
+    tempColumn = Column(Integer)
+
     def serialize(self):
         return {'id': self.id,
                 'name': self.name,

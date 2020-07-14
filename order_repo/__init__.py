@@ -6,8 +6,8 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 
 engine = create_engine('mysql+mysqlconnector://root:mypassword@192.168.1.180', pool_recycle=3600)
-engine.execute("CREATE DATABASE IF NOT EXISTS alchem")  # create db
-engine.execute("USE alchem")
+engine.execute("CREATE DATABASE IF NOT EXISTS testDB")  # create db alchem
+engine.execute("USE testDB")  # alchem
 Base = declarative_base()
 
 from .order import Order
