@@ -152,8 +152,11 @@ def recheck_last_10_customers():
 # d = date(year=2020, month=6, day=18) - timedelta(0)
 # day_basket_list(d)
 
+
+
 for i in range(5):
-    d = date(year=2020, month=7, day=14) - timedelta(i)
+    d = date.today() - timedelta(i)
+        # date(year=2020, month=7, day=14) - timedelta(i)
     day_basket_list(d)
 
 recheck_last_10_customers()

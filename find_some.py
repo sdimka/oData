@@ -95,8 +95,8 @@ def get_last_cost(product_ref, departure_ref):
     return n_res
 
 
-find_from_to()
-# get_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
+# find_from_to()
+get_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
 # start_date = '2020-05-01T00:00:00'
 # end_date = '2020-05-10T23:59:59'
 # get_return_receipts(start_date, end_date)
