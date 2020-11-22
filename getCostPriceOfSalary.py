@@ -180,7 +180,7 @@ def request_patch(catalog: str, select: str, r_filter: str, body: dict):
     :param body:
     :return:
     """
-    request_string = f'http://192.168.1.108/mayco/odata/standard.odata/{catalog}?' \
+    request_string = f'{address}/{base}/odata/standard.odata/{catalog}?' \
                      f'$format=json&' \
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
