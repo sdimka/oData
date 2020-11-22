@@ -171,13 +171,20 @@ def request_jason_data(catalog, select, r_filter):
     return j_data
 
 
-def request_patch(catalog, select, r_filter):
+def request_patch(catalog: str, select: str, r_filter: str, body: dict):
+    """
+
+    :param catalog:
+    :param select:
+    :param r_filter:
+    :param body:
+    :return:
+    """
     request_string = f'http://192.168.1.108/mayco/odata/standard.odata/{catalog}?' \
                      f'$format=json&' \
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
-    data = {'ВнешнийID': '407760900'}
-    n_res = requests.patch(request_string, auth=HTTPBasicAuth('sd', '12345'), data=json.dumps(data))
+    n_res = requests.patch(request_string, auth=HTTPBasicAuth(user, password), data=json.dumps(body))
     n_res.encoding = 'utf-8'
     try:
         j_data = n_res.json()

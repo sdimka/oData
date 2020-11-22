@@ -44,7 +44,8 @@ def patch_product_by_id(id):
     catalog = f"Catalog_Номенклатура(Ref_Key=guid'{id}')"
     select = ''
     filt = ''
-    res = request_patch(catalog, select, filt)
+    body = {'ВнешнийID': '407760900', 'Code': 'ОП000053214'}
+    res = request_patch(catalog, select, filt, body)
     # print(res['Code'], res['Description'], res['DeletionMark'])
     print(res)
 
@@ -109,6 +110,7 @@ def get_last_cost(product_ref, departure_ref):
 # find_from_to()
 get_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
 # patch_product_by_id('e93b7176-7e3c-11dd-a8e6-0019992accca')
+
 # start_date = '2020-05-01T00:00:00'
 # end_date = '2020-05-10T23:59:59'
 # get_return_receipts(start_date, end_date)
