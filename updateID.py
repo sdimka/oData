@@ -2,8 +2,8 @@ import csv
 from getCostPriceOfSalary import request_jason_data, request_patch
 import time
 
-file_name = './data_files/goods_test_sml.csv'
-# file_name = './data_files/goods_test.csv'
+# file_name = './data_files/goods_test_sml.csv'
+file_name = './data_files/goods_test.csv'
 input_file = csv.DictReader(open(file_name, encoding='utf-8-sig'), delimiter=';')
 row_count = sum(1 for row in input_file)
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     print(row_count)
     printProgressBar(0, row_count, prefix='Progress:', suffix='Complete', length=50)
 
-    input_file = csv.DictReader(open("./data_files/goods_test_sml.csv", encoding='utf-8-sig'), delimiter=';')
+    input_file = csv.DictReader(open(file_name, encoding='utf-8-sig'), delimiter=';')
     for row in input_file:
         if row['art'] is not None:
             # print(row)
