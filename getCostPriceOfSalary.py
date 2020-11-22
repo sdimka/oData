@@ -1,3 +1,5 @@
+import json
+
 import requests
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
@@ -5,6 +7,8 @@ from decimal import *
 import sys
 
 from json.decoder import JSONDecodeError
+
+
 def main():
     start_date = '2020-05-03T00:00:00'
     end_date = '2020-05-03T23:59:59'
@@ -147,6 +151,23 @@ def request_jason_data(catalog, select, r_filter):
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
     n_res = requests.get(request_string, auth=HTTPBasicAuth('sd', '12345'))
+    n_res.encoding = 'utf-8'
+    try:
+        j_data = n_res.json()
+    except JSONDecodeError:
+        print(n_res)
+        print(request_string)
+        sys.exit('Error message')
+    return j_data
+
+
+def request_patch(catalog, select, r_filter):
+    request_string = f'http://192.168.1.108/mayco/odata/standard.odata/{catalog}?' \
+                     f'$format=json&' \
+                     f'$select={select}&' \
+                     f'$filter=({r_filter})'
+    data = {'ВнешнийID': '407760900'}
+    n_res = requests.patch(request_string, auth=HTTPBasicAuth('sd', '12345'), data=json.dumps(data))
     n_res.encoding = 'utf-8'
     try:
         j_data = n_res.json()
