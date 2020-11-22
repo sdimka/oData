@@ -8,6 +8,15 @@ import sys
 
 from json.decoder import JSONDecodeError
 
+import configparser
+
+config = configparser.ConfigParser()
+config.read("settings.conf")
+address = config["oDataServer"]["address"]
+user = config["oDataServer"]["username"]
+password = config["oDataServer"]["password"]
+base = config["oDataServer"]["base"]
+
 
 def main():
     start_date = '2020-05-03T00:00:00'
@@ -146,11 +155,12 @@ def get_cost_price(start_date, end_date, dep_ref, type):
 
 
 def request_jason_data(catalog, select, r_filter):
-    request_string = f'http://192.168.1.108/mayco/odata/standard.odata/{catalog}?' \
+
+    request_string = f'{address}/{base}/odata/standard.odata/{catalog}?' \
                      f'$format=json&' \
                      f'$select={select}&' \
                      f'$filter=({r_filter})'
-    n_res = requests.get(request_string, auth=HTTPBasicAuth('sd', '12345'))
+    n_res = requests.get(request_string, auth=HTTPBasicAuth(user, password))
     n_res.encoding = 'utf-8'
     try:
         j_data = n_res.json()
