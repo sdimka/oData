@@ -153,3 +153,4 @@ fabric.properties
 
 # Local conf files
 /settings.conf
+/data_files/*
