@@ -152,4 +152,4 @@ fabric.properties
 /credentials.py
 
 # Local conf files
-settings.conf
+/settings.conf
