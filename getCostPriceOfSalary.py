@@ -27,7 +27,6 @@ def main():
 
 
 def get_salary(start_date, end_date, dep_ref):
-
     # catalog = 'Catalog_Контрагенты'
     # select = 'Ref_Key, Description, ИНН, КПП'
     # filt = 'ИНН eq \'7814153672\''
@@ -90,7 +89,7 @@ def get_salary(start_date, end_date, dep_ref):
                 receipt_date_fd = receipt_date.replace()
                 # Не учитываем с/с доставки,
                 if b['Номенклатура_Key'] != '785ef93b-8e84-11e9-95f9-00505695411f' \
-                        and b['Номенклатура_Key'] != 'aadf2951-a8ce-11e7-a937-005056950094'\
+                        and b['Номенклатура_Key'] != 'aadf2951-a8ce-11e7-a937-005056950094' \
                         and b['Номенклатура_Key'] in sorted_cost_price[receipt_date]:
                     b['cost_price'] = sorted_cost_price[receipt_date][b['Номенклатура_Key']]
                 elif b['Номенклатура_Key'] == '785ef93b-8e84-11e9-95f9-00505695411f' \
@@ -100,7 +99,8 @@ def get_salary(start_date, end_date, dep_ref):
                     b['cost_price'] = cost_price_period[receipt_date.replace(day=1)][b['Номенклатура_Key']]
 
                 else:
-                    raise Exception(f"Could't find Key {b['Номенклатура_Key']} in cost_price on Date:{a['Date']}, Doc {a['Number']}")
+                    raise Exception(
+                        f"Could't find Key {b['Номенклатура_Key']} in cost_price on Date:{a['Date']}, Doc {a['Number']}")
 
                 total_cost_price = total_cost_price + Decimal(str(b['cost_price'] * b['Количество']))
                 total_price += b['Сумма']
@@ -147,15 +147,14 @@ def get_cost_price(start_date, end_date, dep_ref, type):
             if type != 'day':
                 date = date.replace(day=1)
             if date in sorted_cost_price:
-                sorted_cost_price[date].update({a['Номенклатура_Key']: round(a['Стоимость']/a['Количество'], 2)})
+                sorted_cost_price[date].update({a['Номенклатура_Key']: round(a['Стоимость'] / a['Количество'], 2)})
             else:
-                sorted_cost_price[date] = {a['Номенклатура_Key']: round(a['Стоимость']/a['Количество'], 2)}
+                sorted_cost_price[date] = {a['Номенклатура_Key']: round(a['Стоимость'] / a['Количество'], 2)}
 
     return sorted_cost_price
 
 
 def request_jason_data(catalog, select, r_filter):
-
     request_string = f'{address}/{base}/odata/standard.odata/{catalog}?' \
                      f'$format=json&' \
                      f'$select={select}&' \
@@ -195,6 +194,26 @@ def request_patch(catalog: str, select: str, r_filter: str, body: dict):
     return j_data
 
 
+def request_post(catalog: str, select: str, r_filter: str, body: dict):
+    request_string = f'{address}/{base}/odata/standard.odata/{catalog}?' \
+                     f'$format=json&'
+    n_res = requests.post(request_string, auth=HTTPBasicAuth(user, password), data=json.dumps(body))
+    return n_res.json()
+
+
+def request_post_document(catalog: str, guid: str):
+    request_string = f"{address}/{base}/odata/standard.odata/{catalog}(Ref_Key=guid'{guid}')/Post?PostingModeOperational=false"
+    print(request_string)
+    n_res = requests.post(request_string, auth=HTTPBasicAuth(user, password))
+    return n_res
+
+
+def request_delete_document(catalog: str, guid: str):
+    request_string = f"{address}/{base}/odata/standard.odata/{catalog}(Ref_Key=guid'{guid}')"
+    n_res = requests.delete(request_string, auth=HTTPBasicAuth(user, password))
+    return n_res
+
+
 def request_a(catalog, select, r_filter):
     request_string = f'http://192.168.1.108/mayco/odata/standard.odata/{catalog}?' \
                      f'$format=json&' \
@@ -207,4 +226,3 @@ def request_a(catalog, select, r_filter):
 
 if __name__ == '__main__':
     main()
-

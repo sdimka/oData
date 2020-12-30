@@ -28,6 +28,8 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Че-как
 
+getCostPriceOfSalary - основной, request_jason_data, request_patch
+
 oData_clients.py - поиск клиентов по чекам и загрузка в БД
 
 exchanger.py - загрузка заказов из Битры и сопоставление клиентов
