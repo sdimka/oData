@@ -187,6 +187,8 @@ def request_patch(catalog: str, select: str, r_filter: str, body: dict):
     n_res.encoding = 'utf-8'
     try:
         j_data = n_res.json()
+        if 'odata.error' in j_data:
+            print(j_data['odata.error'])
     except JSONDecodeError:
         print(n_res)
         print(request_string)

@@ -1,8 +1,10 @@
 import csv
+from datetime import datetime
+
 from getCostPriceOfSalary import request_jason_data, request_patch
 import time
 
-file_name = './data_files/goods_test_sml.csv'
+file_name = './data_files/ID_04_01_20_test.csv'
 # file_name = './data_files/goods_test.csv'
 input_file = csv.DictReader(open(file_name, encoding='utf-8-sig'), delimiter=';')
 row_count = sum(1 for row in input_file)
@@ -40,11 +42,12 @@ if __name__ == "__main__":
 
     input_file = csv.DictReader(open(file_name, encoding='utf-8-sig'), delimiter=';')
 
+    start_time = datetime.now()
     for row in input_file:
         if row['art'] is not None:
             catalog = 'Catalog_Номенклатура'
             select = f""
-            filt = f"Артикул eq '{row['art']}'"
+            filt = f"Code eq '{row['art']}'"
             res = request_jason_data(catalog, select, filt)
 
             if len(res['value']) > 0:
@@ -61,6 +64,8 @@ if __name__ == "__main__":
                 bad_val.update({row['art']: res})
         count += 1
         printProgressBar(count, row_count, prefix='Progress:', suffix='Complete', length=50)
+
+    print(f'Elapsed time: {datetime.now() - start_time}')
 
     for a in bad_val:
         print(a)
